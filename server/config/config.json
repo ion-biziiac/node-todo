@@ -1,0 +1,26 @@
+{
+  "development": {
+    "username": "nodedev",
+    "password": "nodedev",
+    "database": "todos_dev",
+    "host": "127.0.0.1",
+    "port": 5432,
+    "dialect": "postgres"
+  },
+  "test": {
+    "username": "nodedev",
+    "password": "nodedev",
+    "database": "todos_test",
+    "host": "127.0.0.1",
+    "port": 5432,
+    "dialect": "postgres"
+  },
+  "production": {
+    "username": "nodedev",
+    "password": "nodedev",
+    "database": "todos",
+    "host": "127.0.0.1",
+    "port": 5432,
+    "dialect": "postgres"
+  }
+}

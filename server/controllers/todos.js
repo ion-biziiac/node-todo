@@ -11,7 +11,7 @@ module.exports = {
         }],
       })
       .then(todos => res.status(200).send(todos))
-      .catch(error => res.status(400).send(error));
+      .catch(error => res.status(400).send(error.message));
   },
 
   retrieve(req, res) {
@@ -30,7 +30,7 @@ module.exports = {
         }
         return res.status(200).send(todo);
       })
-      .catch(error => res.status(400).send(error));
+      .catch(error => res.status(400).send(error.message));
   },
 
   create(req, res) {
@@ -39,7 +39,7 @@ module.exports = {
         title: req.body.title,
       })
       .then(todo => res.status(201).send(todo))
-      .catch(error => res.status(400).send(error));
+      .catch(error => res.status(400).send(error.message));
   },
 
   update(req, res) {
@@ -61,9 +61,9 @@ module.exports = {
             title: req.body.title || todo.title,
           })
           .then(() => res.status(200).send(todo))  // Send back the updated todo.
-          .catch((error) => res.status(400).send(error));
+          .catch((error) => res.status(400).send(error.message));
       })
-      .catch((error) => res.status(400).send(error));
+      .catch((error) => res.status(400).send(error.message));
   },
 
   destroy(req, res) {
@@ -78,8 +78,8 @@ module.exports = {
         return todo
           .destroy()
           .then(() => res.status(204).send())
-          .catch(error => res.status(400).send(error));
+          .catch(error => res.status(400).send(error.message));
       })
-      .catch(error => res.status(400).send(error));
+      .catch(error => res.status(400).send(error.message));
   }
 };

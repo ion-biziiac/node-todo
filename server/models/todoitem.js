@@ -3,6 +3,12 @@ module.exports = (sequelize, DataTypes) => {
     content: {
       type: DataTypes.STRING,
       allowNull: false,
+      validate: { 
+        len: {
+          args: [0, 255],
+          msg: 'Content should be between 5 and 40 characters'
+        }
+      }
     },
     complete: {
       type: DataTypes.BOOLEAN,

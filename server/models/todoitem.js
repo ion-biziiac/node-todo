@@ -5,8 +5,8 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       validate: { 
         len: {
-          args: [0, 255],
-          msg: 'Content should be between 5 and 40 characters'
+          args: [1, 255],
+          msg: 'Content should be between 1 and 255 characters'
         }
       }
     },
@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
   TodoItem.associate = (models) => {
     TodoItem.belongsTo(models.Todo, {
       foreignKey: 'todoId',
-      onDelete: 'CASCADE',
+      onDelete: 'CASCADE'
     });
   };
 

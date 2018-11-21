@@ -1,0 +1,5 @@
+--reporter spec
+--recursive
+--require test/setup
+--timeout 30000
+--exit

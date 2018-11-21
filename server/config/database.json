@@ -5,7 +5,8 @@
     "database": "todos_dev",
     "host": "127.0.0.1",
     "port": 5432,
-    "dialect": "postgres"
+    "dialect": "postgres",
+    "operatorsAliases": false
   },
   "test": {
     "username": "nodedev",
@@ -13,7 +14,9 @@
     "database": "todos_test",
     "host": "127.0.0.1",
     "port": 5432,
-    "dialect": "postgres"
+    "dialect": "postgres",
+    "operatorsAliases": false,
+    "logging": false
   },
   "production": {
     "username": "nodedev",
@@ -21,6 +24,7 @@
     "database": "todos",
     "host": "127.0.0.1",
     "port": 5432,
-    "dialect": "postgres"
+    "dialect": "postgres",
+    "operatorsAliases": false
   }
 }

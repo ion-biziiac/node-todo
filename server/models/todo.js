@@ -6,8 +6,8 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       validate: { 
         len: {
-          args: [0, 255],
-          msg: 'Title should be between 5 and 40 characters'
+          args: [1, 255],
+          msg: 'Title should be between 1 and 255 characters'
         }
       }
     },
@@ -16,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
   Todo.associate = (models) => {
     Todo.hasMany(models.TodoItem, {
       foreignKey: 'todoId',
-      as: 'todoItems',
+      as: 'todoItems'
     });
   };
 

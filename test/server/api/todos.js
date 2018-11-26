@@ -1,12 +1,12 @@
 const server = require('../../../app');
 
-describe('Todos', () => {
+describe('server/controllers/todos', () => {
   afterEach((done) => {
     dbCleaner().then(done());
   });
 
   describe('Fetch Todos', () => {
-    it('it should GET all the Todos with Todo Items', async() => {
+    it('should GET all the Todos with Todo Items', async() => {
       const todo = await factories.create('todo').then(async(todo) => { 
         todo.todoItems = await factories
                                  .createMany('todoItem', 2, { todoId: todo.id })
@@ -24,7 +24,7 @@ describe('Todos', () => {
         .eql(todo.todoItems.map(item => item.content).sort());
     });
 
-    it('it should return an empty array when there are no Todos', async() => {
+    it('should return an empty array when there are no Todos', async() => {
       const res = await chai.request(server).get('/api/todos');
       expect(res.status).to.eql(200);
       expect(res.body).to.be.an('array');
@@ -33,7 +33,7 @@ describe('Todos', () => {
   });
 
   describe('Fetch Todo by id', () => {
-    it('it should GET a Todo with Todo Items', async() => {
+    it('should GET a Todo with Todo Items', async() => {
       const todo = await factories.create('todo').then(async(todo) => { 
         todo.todoItems = await factories
                                  .createMany('todoItem', 2, { todoId: todo.id })
@@ -50,16 +50,23 @@ describe('Todos', () => {
         .eql(todo.todoItems.map(item => item.content).sort());
     });
 
-    it('it should return an error message when Todo not found', async() => {
+    it('should return an error message when TodoId param is not valid', async() => {
       const res = await chai.request(server).get('/api/todos/dummyId');
       expect(res.status).to.eql(400);
       expect(res.body).to.be.an('object');
       expect(res.body.message).to.eql('invalid input syntax for integer: "dummyId"');
     });
+
+    it('should return 404 when Todo not found', async() => {
+      const res = await chai.request(server).get('/api/todos/543212345');
+      expect(res.status).to.eql(404);
+      expect(res.body).to.be.an('object');
+      expect(res.body.message).to.eql('Todo Not Found');
+    });
   });
 
   describe('Create Todo', () => {
-    it('it should create a Todo', async() => {
+    it('should create a Todo', async() => {
       const todoParams = {
         title: 'My Todo'
       }
@@ -76,7 +83,7 @@ describe('Todos', () => {
       expect(res.body.title).to.eql('My Todo');
     });
 
-    it('it should validate Todo title presence', async() => {
+    it('should validate Todo title presence', async() => {
       const todoParams = {
         title: null
       }
@@ -90,7 +97,7 @@ describe('Todos', () => {
       expect(res.body).to.have.property('message');
     });
 
-    it('it should validate Todo title length', async() => {
+    it('should validate Todo title length', async() => {
       const todoParams = {
         title: ""
       }
@@ -104,6 +111,40 @@ describe('Todos', () => {
       expect(res.body.message)
         .to
         .eql('Validation error: Title should be between 1 and 255 characters');
+    });
+  });
+
+  describe('Update Todo', () => {
+    it('should update a Todo', async() => {
+      const todoParams = {
+        title: 'Updated Todo'
+      }
+      const todo = await factories.create('todo')
+                                  .then(todo => { return todo });
+      const res = await chai
+                          .request(server)
+                          .put(`/api/todos/${todo.id}`)
+                          .send(todoParams)
+                          .then((res) => { return res });
+      expect(res.status).to.eql(200);
+      expect(res.body).to.be.an('object');
+      expect(res.body).to.have.property('title');
+      expect(res.body).to.have.property('createdAt');
+      expect(res.body).to.have.property('updatedAt');
+      expect(res.body.title).to.eql('Updated Todo');
+    });
+  });
+
+  describe('Delete Todo', () => {
+    it('should delete a Todo', async() => {
+      const todo = await factories.create('todo')
+                                  .then(todo => { return todo });
+      const res = await chai
+                          .request(server)
+                          .delete(`/api/todos/${todo.id}`)
+                          .then((res) => { return res });
+      expect(res.status).to.eql(204);
+      expect(res.body).to.be.an('object');
     });
   });
 });

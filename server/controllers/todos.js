@@ -44,7 +44,7 @@ module.exports = {
 
   update(req, res) {
     return Todo
-      .findByPK(req.params.todoId, {
+      .findByPk(req.params.todoId, {
         include: [{
           model: TodoItem,
           as: 'todoItems',

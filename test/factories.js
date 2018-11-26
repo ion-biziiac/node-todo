@@ -14,6 +14,7 @@ factory.extend('todo', 'todoWithItems', {
 });
 
 factory.define('todoItem', TodoItem, {
+  //todo: factory.assoc('todo', 'id'),
   content: factory.seq('TodoItem.content', (n) => `My TodoItem content ${n}`)
 });
 

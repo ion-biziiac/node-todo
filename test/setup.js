@@ -26,4 +26,4 @@ global.factories = factories;
 global.pry = pry;
 global.chai = chai
 global.expect = chai.expect;
-global.dbCleaner = dbCleaner
+global.dbCleaner = dbCleaner;

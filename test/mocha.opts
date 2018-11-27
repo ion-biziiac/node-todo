@@ -1,5 +1,6 @@
 --reporter spec
 --recursive
+--retries 2
 --require test/setup
 --timeout 30000
 --exit

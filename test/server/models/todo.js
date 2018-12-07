@@ -1,7 +1,11 @@
-const Todo = require('../../../server/models').Todo;
-const TodoItem = require('../../../server/models').TodoItem;
+const { Todo, TodoItem, User } = require('../../../server/models');
+let user;
 
 describe('server/models/todo', () => {
+  beforeEach(async() => {
+    user = await factories.create('user');
+  });
+
   afterEach((done) => {
     dbCleaner().then(done());
   });
@@ -10,7 +14,8 @@ describe('server/models/todo', () => {
     it('should create a Todo', async() => {
       await Todo
         .create({
-          title: 'New Todo'
+          title: 'New Todo',
+          userId: user.id
         })
         .then(todo => {
           expect(todo.title).to.eql('New Todo');
@@ -19,7 +24,7 @@ describe('server/models/todo', () => {
 
     it('should validate title presence', async() => {
       await Todo
-        .create()
+        .create({ userId: user.id })
         .catch(error => {
           expect(error.message).to.eql('notNull Violation: Todo.title cannot be null');
         });
@@ -28,7 +33,8 @@ describe('server/models/todo', () => {
     it('should validate title length', async() => {
       await Todo
         .create({
-          title: ''
+          title: '',
+          userId: user.id
         })
         .catch(error => {
           expect(error.message).to.eql('Validation error: Title should be between 1 and 255 characters');
@@ -39,7 +45,8 @@ describe('server/models/todo', () => {
   describe('Update Todo', () => {
     it('should update a Todo', async() => {
       await Todo.create({ 
-        title: 'New Todo' 
+        title: 'New Todo',
+        userId: user.id
       }).then(todo => {
         return todo.update({
           title: 'Updated Todo'
@@ -52,7 +59,7 @@ describe('server/models/todo', () => {
 
   describe('Delete Todo', () => {
     it('should delete a Todo', async() => {
-      const todo = await Todo.create({ title: 'New Todo' });
+      const todo = await Todo.create({ title: 'New Todo', userId: user.id });
       
       let todos = await Todo.findAll();
       expect(todos.length).to.eql(1);
@@ -66,6 +73,7 @@ describe('server/models/todo', () => {
     it('should create with Todo Items', async() => {
       const todo = Todo.build({ 
         title: 'Title',
+        userId: user.id,
         todoItems: [
           {
             content: 'Item 1',
@@ -96,6 +104,7 @@ describe('server/models/todo', () => {
     it('should destroy with Todo Items', async() => {
       const todo = await Todo.create({ 
         title: 'Title',
+        userId: user.id,
         todoItems: [
           {
             content: 'Item 1',

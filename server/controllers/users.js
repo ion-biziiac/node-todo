@@ -3,7 +3,9 @@ const jwtSecret = require('../config/jwtSecret').secret;
 const User = require('../models').User;
 
 module.exports = {
-  create(req, res) {
+  create(req, res, next) {
+    req.ability.throwUnlessCan('create', 'User');
+
     return User
       .create({
         firstName: req.body.firstName,
@@ -17,31 +19,34 @@ module.exports = {
         firstName: user.firstName,
         lastName: user.lastName
       }))
-      .catch(error => res.status(400).send({ message: error.message }));
+      .catch(next);
   },
 
-  retrieve(req, res) {
+  retrieve(req, res, next) {
     return User
       .findByPk(req.params.userId)
       .then(user => {
-        if (!user) {
+        if(user) {
+          req.ability.throwUnlessCan('read', user);
+  
+          return res.status(200).send({
+            id: user.id,
+            email: user.email,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            createdAt: user.createdAt,
+            updatedAt: user.updatedAt
+          });
+        } else {
           return res.status(404).send({
             message: 'User Not Found'
           });
         }
-        return res.status(200).send({
-          id: user.id,
-          email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          createdAt: user.createdAt,
-          updatedAt: user.updatedAt
-        });
       })
-      .catch(error => res.status(400).send({ message: error.message }));
+      .catch(next);
   },
   
-  authenticate(req, res) {
+  authenticate(req, res, next) {
     const email = req.body.email;
     const password = req.body.password;
 
@@ -53,7 +58,7 @@ module.exports = {
       if(user) {
         if(user.validPassword(password)) {
           const token = jwt.sign({ email: user.email }, jwtSecret, {
-            expiresIn: 604800 // 1 week
+            expiresIn: '1d'
           });
           return res.status(200).send({
             token: 'JWT ' + token,
@@ -74,23 +79,18 @@ module.exports = {
           message: 'User Not Found',
         });
       }
-    }).catch(error => {
-      return res.status(400).send({ message: error.message });
-    });
+    }).catch(next);
   },
 
-  logout(req, res) {
-    req.logout();
-    return res.status(200).send({ message: 'Signed out successfully' });
-  },
-
-  profile(req, res) {
+  profile(req, res, next) {
     return User.findOne({
       where: {
         email: req.user.email
       },
     }).then(user => {
       if(user) {
+        req.ability.throwUnlessCan('read', user);
+
         return res.status(200).send({
           id: user.id,
           email: user.email,
@@ -104,8 +104,6 @@ module.exports = {
           message: 'User Not Found'
         });
       }
-    }).catch(error => {
-      return res.status(400).send({ message: error.message });
-    });
+    }).catch(next);
   }
 };

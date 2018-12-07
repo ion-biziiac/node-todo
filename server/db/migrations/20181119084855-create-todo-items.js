@@ -24,6 +24,7 @@ module.exports = {
         type: Sequelize.DATE,
       },
       todoId: {
+        allowNull: false,
         type: Sequelize.INTEGER,
         onDelete: 'CASCADE',
         references: {

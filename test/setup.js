@@ -6,9 +6,8 @@ const factories = require('./factories');
 const pry = require('pryjs');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
-chai.use(chaiHttp);
 
-function dbCleaner() {
+const dbCleaner = () => {
   return Promise.all(
     map(Object.keys(models), (key) => {
       if (['sequelize', 'Sequelize'].includes(key)) return null;
@@ -20,10 +19,25 @@ function dbCleaner() {
       });
     })
   );
-}
+};
 
+const loginUser = async(app, user) => {
+  return await chai
+                 .request(app)
+                 .post('/api/authenticate')
+                 .send({
+                   email: user.email,
+                   password: 'password'
+                 })
+                 .then((res) => { 
+                   return res.body.token 
+                 });
+};
+
+chai.use(chaiHttp);
 global.factories = factories;
 global.pry = pry;
 global.chai = chai
 global.expect = chai.expect;
 global.dbCleaner = dbCleaner;
+global.loginUser = loginUser;

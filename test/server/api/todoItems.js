@@ -1,13 +1,19 @@
 const server = require('../../../app');
+let admin, token;
 
 describe('server/controllers/todoItems', () => {
+  beforeEach(async() => {
+    admin = await factories.create('admin');
+    token = await loginUser(server, admin);
+  });
+
   afterEach((done) => {
     dbCleaner().then(done());
   });
 
   describe('Create TodoItem', () => {
     it('should create a TodoItem', async() => {
-      const todo = await factories.create('todo')
+      const todo = await factories.create('todo', { userId: admin.id })
                                   .then(todo => { return todo });
       const todoItemParams = {
         content: 'A new TodoItem'
@@ -15,6 +21,7 @@ describe('server/controllers/todoItems', () => {
       const res = await chai
                           .request(server)
                           .post(`/api/todos/${todo.id}/items`)
+                          .set('Authorization', token)
                           .send(todoItemParams)
                           .then((res) => { return res });
       expect(res.status).to.eql(201);
@@ -33,6 +40,7 @@ describe('server/controllers/todoItems', () => {
       const res = await chai
                           .request(server)
                           .post('/api/todos/123321/items')
+                          .set('Authorization', token)
                           .send(todoItemParams)
                           .then((res) => { return res });
       expect(res.status).to.eql(404);
@@ -41,7 +49,7 @@ describe('server/controllers/todoItems', () => {
     });
 
     it('should validate content length', async() => {
-      const todo = await factories.create('todo')
+      const todo = await factories.create('todo', { userId: admin.id })
                                   .then(todo => { return todo });
       const todoItemParams = {
         content: ''
@@ -49,6 +57,7 @@ describe('server/controllers/todoItems', () => {
       const res = await chai
                           .request(server)
                           .post(`/api/todos/${todo.id}/items`)
+                          .set('Authorization', token)
                           .send(todoItemParams)
                           .then((res) => { return res });
       expect(res.status).to.eql(400);
@@ -65,13 +74,14 @@ describe('server/controllers/todoItems', () => {
         content: 'Updated TodoItem',
         complete: true
       }
-      const todo = await factories.create('todo')
+      const todo = await factories.create('todo', { userId: admin.id })
                                   .then(todo => { return todo });
       const todoItem = await factories.create('todoItem', { todoId: todo.id })
                                       .then(todoItem => { return todoItem });
       const res = await chai
                           .request(server)
                           .put(`/api/todos/${todo.id}/items/${todoItem.id}`)
+                          .set('Authorization', token)
                           .send(todoItemParams)
                           .then((res) => { return res });
       expect(res.status).to.eql(200);
@@ -91,6 +101,7 @@ describe('server/controllers/todoItems', () => {
       const res = await chai
                           .request(server)
                           .put('/api/todos/123321/items/123456')
+                          .set('Authorization', token)
                           .send(todoItemParams)
                           .then((res) => { return res });
       expect(res.status).to.eql(404);
@@ -101,13 +112,14 @@ describe('server/controllers/todoItems', () => {
 
   describe('Delete TodoItem', () => {
     it('should delete a TodoItem', async() => {
-      const todo = await factories.create('todo')
+      const todo = await factories.create('todo', { userId: admin.id })
                                   .then(todo => { return todo });
       const todoItem = await factories.create('todoItem', { todoId: todo.id })
                                       .then(todoItem => { return todoItem });
       const res = await chai
                           .request(server)
                           .delete(`/api/todos/${todo.id}/items/${todoItem.id}`)
+                          .set('Authorization', token)
                           .then((res) => { return res });
       expect(res.status).to.eql(204);
       expect(res.body).to.be.an('object');

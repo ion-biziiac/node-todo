@@ -1,3 +1,5 @@
+const abilityToQuery = require('../lib/caslSequelize');
+
 module.exports = (sequelize, DataTypes) => {
   const TodoItem = sequelize.define('TodoItem', {
     content: {
@@ -13,7 +15,13 @@ module.exports = (sequelize, DataTypes) => {
     complete: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
-    },
+    }
+  }, {
+    scopes: {
+      accessibleBy(ability, action = 'read') {
+        return { where: abilityToQuery(ability, 'Todo') }
+      }
+    }
   });
 
   TodoItem.associate = (models) => {

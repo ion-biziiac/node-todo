@@ -1,9 +1,19 @@
 process.env.NODE_ENV = 'test';
 const factoryGirl = require('factory-girl');
 const factory = factoryGirl.factory;
+const { Todo, TodoItem, User } = require('../server/models');
 
-const Todo = require('../server/models').Todo;
-const TodoItem = require('../server/models').TodoItem;
+factory.define('user', User, {
+  firstName: factory.seq('User.firstName', (n) => `John ${n}`),
+  lastName: factory.seq('User.flastName', (n) => `Doe ${n}`),
+  email: factory.seq('User.email', (n) => `user${n}@mail.com`),
+  password: 'password',
+  role: 'user'
+});
+
+factory.extend('user', 'admin', { 
+  role: 'admin'
+});
 
 factory.define('todo', Todo, {
   title: factory.seq('Todo.title', (n) => `My Todo ${n}`)

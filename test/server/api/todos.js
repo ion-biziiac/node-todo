@@ -1,19 +1,28 @@
 const server = require('../../../app');
+let admin, token;
 
 describe('server/controllers/todos', () => {
+  beforeEach(async() => {
+    admin = await factories.create('admin');
+    token = await loginUser(server, admin);
+  });
+
   afterEach((done) => {
     dbCleaner().then(done());
   });
 
   describe('Fetch Todos', () => {
     it('should GET all the Todos with Todo Items', async() => {
-      const todo = await factories.create('todo').then(async(todo) => { 
+      const todo = await factories.create('todo', { userId: admin.id }).then(async(todo) => { 
         todo.todoItems = await factories
                                  .createMany('todoItem', 2, { todoId: todo.id })
                                  .then(todoItems => { return todoItems });
         return todo; 
       });
-      const res = await chai.request(server).get('/api/todos');
+
+      const res = await chai.request(server)
+                            .get('/api/todos')
+                            .set('Authorization', token);
       expect(res.status).to.eql(200);
       expect(res.body).to.be.an('array');
       expect(res.body.length).to.eql(1);
@@ -25,7 +34,9 @@ describe('server/controllers/todos', () => {
     });
 
     it('should return an empty array when there are no Todos', async() => {
-      const res = await chai.request(server).get('/api/todos');
+      const res = await chai.request(server)
+                            .get('/api/todos')
+                            .set('Authorization', token);
       expect(res.status).to.eql(200);
       expect(res.body).to.be.an('array');
       expect(res.body).to.eql([]);
@@ -34,13 +45,15 @@ describe('server/controllers/todos', () => {
 
   describe('Fetch Todo by id', () => {
     it('should GET a Todo with Todo Items', async() => {
-      const todo = await factories.create('todo').then(async(todo) => { 
+      const todo = await factories.create('todo', { userId: admin.id }).then(async(todo) => { 
         todo.todoItems = await factories
                                  .createMany('todoItem', 2, { todoId: todo.id })
                                  .then(todoItems => { return todoItems });
         return todo; 
       });
-      const res = await chai.request(server).get(`/api/todos/${todo.id}`);
+      const res = await chai.request(server)
+                            .get(`/api/todos/${todo.id}`)
+                            .set('Authorization', token);
       expect(res.status).to.eql(200);
       expect(res.body).to.be.an('object');
       expect(res.body.title).to.eql(todo.title);
@@ -51,14 +64,18 @@ describe('server/controllers/todos', () => {
     });
 
     it('should return an error message when TodoId param is not valid', async() => {
-      const res = await chai.request(server).get('/api/todos/dummyId');
-      expect(res.status).to.eql(400);
+      const res = await chai.request(server)
+                            .get('/api/todos/dummyId')
+                            .set('Authorization', token);
+      expect(res.status).to.eql(500);
       expect(res.body).to.be.an('object');
       expect(res.body.message).to.eql('invalid input syntax for integer: "dummyId"');
     });
 
     it('should return 404 when Todo not found', async() => {
-      const res = await chai.request(server).get('/api/todos/543212345');
+      const res = await chai.request(server)
+                            .get('/api/todos/543212345')
+                            .set('Authorization', token);
       expect(res.status).to.eql(404);
       expect(res.body).to.be.an('object');
       expect(res.body.message).to.eql('Todo Not Found');
@@ -73,6 +90,7 @@ describe('server/controllers/todos', () => {
       const res = await chai
                           .request(server)
                           .post('/api/todos')
+                          .set('Authorization', token)
                           .send(todoParams)
                           .then((res) => { return res });
       expect(res.status).to.eql(201);
@@ -90,6 +108,7 @@ describe('server/controllers/todos', () => {
       const res = await chai
                           .request(server)
                           .post('/api/todos')
+                          .set('Authorization', token)
                           .send(todoParams)
                           .then((res) => { return res });
       expect(res.status).to.eql(400);
@@ -104,6 +123,7 @@ describe('server/controllers/todos', () => {
       const res = await chai
                           .request(server)
                           .post('/api/todos')
+                          .set('Authorization', token)
                           .send(todoParams)
                           .then((res) => { return res });
       expect(res.status).to.eql(400);
@@ -119,11 +139,12 @@ describe('server/controllers/todos', () => {
       const todoParams = {
         title: 'Updated Todo'
       }
-      const todo = await factories.create('todo')
+      const todo = await factories.create('todo', { userId: admin.id })
                                   .then(todo => { return todo });
       const res = await chai
                           .request(server)
                           .put(`/api/todos/${todo.id}`)
+                          .set('Authorization', token)
                           .send(todoParams)
                           .then((res) => { return res });
       expect(res.status).to.eql(200);
@@ -137,11 +158,12 @@ describe('server/controllers/todos', () => {
 
   describe('Delete Todo', () => {
     it('should delete a Todo', async() => {
-      const todo = await factories.create('todo')
+      const todo = await factories.create('todo', { userId: admin.id })
                                   .then(todo => { return todo });
       const res = await chai
                           .request(server)
                           .delete(`/api/todos/${todo.id}`)
+                          .set('Authorization', token)
                           .then((res) => { return res });
       expect(res.status).to.eql(204);
       expect(res.body).to.be.an('object');

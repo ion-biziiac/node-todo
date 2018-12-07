@@ -1,17 +1,23 @@
-const Todo = require('../../../server/models').Todo;
-const TodoItem = require('../../../server/models').TodoItem;
+const { Todo, TodoItem, User } = require('../../../server/models');
+let user;
 
 describe('server/models/todoItem', () => {
+  beforeEach(async() => {
+    user = await factories.create('user');
+  });
+
   afterEach((done) => {
     dbCleaner().then(done());
   });
 
   describe('Create TodoItem', () => {
     it('should create a TodoItem', async() => {
+      const todo = await factories.create('todo', { userId: user.id });
       await TodoItem
         .create({
           content: 'New Todo Item',
-          complete: true
+          complete: true,
+          todoId: todo.id
         })
         .then(todoItem => {
           expect(todoItem.content).to.eql('New Todo Item');
@@ -41,8 +47,10 @@ describe('server/models/todoItem', () => {
 
   describe('Update TodoItem', () => {
     it('should update a TodoItem', async() => {
+      const todo = await factories.create('todo', { userId: user.id });
       await TodoItem.create({ 
-        content: 'New Todo Item' 
+        content: 'New Todo Item',
+        todoId: todo.id
       }).then(todoItem => {
         return todoItem.update({
           content: 'Updated Todo Item'
@@ -55,7 +63,11 @@ describe('server/models/todoItem', () => {
 
   describe('Delete TodoItem', () => {
     it('should delete a TodoItem', async() => {
-      const todoItem = await TodoItem.create({ content: 'New Todo Item' });
+      const todo = await factories.create('todo', { userId: user.id });
+      const todoItem = await TodoItem.create({ 
+        content: 'New Todo Item',
+        todoId: todo.id
+      });
       
       let todoItems = await TodoItem.findAll();
       expect(todoItems.length).to.eql(1);
@@ -69,7 +81,10 @@ describe('server/models/todoItem', () => {
     it('should create TodoItem with Todo', async() => {
       await TodoItem.create({ 
         content: 'Content',
-        todo: { title: 'Title'}
+        todo: { 
+          title: 'Title',
+          userId: user.id
+        }
       }, {
         include: {
           model: Todo,
@@ -84,7 +99,10 @@ describe('server/models/todoItem', () => {
     it('should delete TodoItem without Todo', async() => {
       const todoItem = await TodoItem.create({ 
         content: 'Content',
-        todo: { title: 'Title'}
+        todo: { 
+          title: 'Title',
+          userId: user.id
+        }
       }, {
         include: {
           model: Todo,

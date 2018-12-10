@@ -11,7 +11,7 @@ module.exports = {
       .findAll({
         include: [{
           model: TodoItem,
-          as: 'todoItems',
+          as: 'todoItems'
         }]
       })
       .then(todos => {
@@ -25,7 +25,7 @@ module.exports = {
       .findByPk(req.params.todoId, {
         include: [{
           model: TodoItem,
-          as: 'todoItems',
+          as: 'todoItems'
         }]
       })
       .then(todo => {
@@ -59,13 +59,13 @@ module.exports = {
       .findByPk(req.params.todoId, {
         include: [{
           model: TodoItem,
-          as: 'todoItems',
+          as: 'todoItems'
         }],
       })
       .then(todo => {
         if (!todo) {
           return res.status(404).send({
-            message: 'Todo Not Found',
+            message: 'Todo Not Found'
           });
         }
 
@@ -73,7 +73,7 @@ module.exports = {
 
         return todo
           .update({
-            title: req.body.title || todo.title,
+            title: req.body.title || todo.title
           })
           .then(() => res.status(200).send(todo))
           .catch(next);
@@ -87,7 +87,7 @@ module.exports = {
       .then(todo => {
         if (!todo) {
           return res.status(400).send({
-            message: 'Todo Not Found',
+            message: 'Todo Not Found'
           });
         }
 

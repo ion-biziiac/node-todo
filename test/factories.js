@@ -15,6 +15,10 @@ factory.extend('user', 'admin', {
   role: 'admin'
 });
 
+factory.extend('user', 'disabledUser', { 
+  role: 'disabled'
+});
+
 factory.define('todo', Todo, {
   title: factory.seq('Todo.title', (n) => `My Todo ${n}`)
 });

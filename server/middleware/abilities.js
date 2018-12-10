@@ -3,16 +3,16 @@ const { AbilityBuilder, Ability } = require('@casl/ability');
 const defineAbilitiesFor = (user) => {
   const { rules, can, cannot } = AbilityBuilder.extract();
 
-  cannot('read', 'all');
-  cannot('manage', 'all')
-
   if (user) {
     if (user.isAdmin()) {
       can('manage', 'all');
-    } else {
+    } else if (user.isUser()) {
       can(['read', 'create', 'delete', 'update'], 'Todo', { userId: user.id });
-      can(['read', 'create', 'delete', 'update'], 'TodoItem', { "todo.userId": user.id });
-      can(['read', 'update'], 'User', { id: user.id });
+      can(['create', 'delete', 'update'], 'TodoItem', { 'todo.userId': user.id });
+      can('read', 'User', { id: user.id });
+      can('update', 'User', ['firstName', 'lastName', 'email', 'password'], { id: user.id });
+    } else if (user.isDisabled()) {
+      cannot('manage', 'all');
     }
   }
 

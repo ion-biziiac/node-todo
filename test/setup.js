@@ -15,23 +15,23 @@ const dbCleaner = () => {
         where: {}, 
         truncate: true, 
         cascade: true, 
-        force: true 
+        restartIdentity: true 
       });
     })
   );
 };
 
-const loginUser = async(app, user) => {
-  return await chai
-                 .request(app)
-                 .post('/api/authenticate')
-                 .send({
-                   email: user.email,
-                   password: 'password'
-                 })
-                 .then((res) => { 
-                   return res.body.token 
-                 });
+const loginUser = (app, user) => {
+  return chai
+           .request(app)
+           .post('/api/authenticate')
+           .send({
+             email: user.email,
+             password: 'password'
+           })
+           .then((res) => { 
+             return res.body.token 
+           });
 };
 
 chai.use(chaiHttp);

@@ -14,9 +14,12 @@ module.exports = (app) => {
   app.use(passport.authenticate('jwt', { session: false }), createAbilities);
 
   // user routes
-  app.post('/api/users', users.create);
+  app.get('/api/users', users.list);
   app.get('/api/profile', users.profile);
   app.get('/api/users/:userId', users.retrieve);
+  app.post('/api/users', users.create);
+  app.put('/api/users/:userId', users.update);
+  app.delete('/api/users/:userId', users.destroy);
 
   // todo routes
   app.get('/api/todos', todos.list);

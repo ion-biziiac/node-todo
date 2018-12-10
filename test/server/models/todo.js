@@ -1,4 +1,4 @@
-const { Todo, TodoItem, User } = require('../../../server/models');
+const { Todo, TodoItem } = require('../../../server/models');
 let user;
 
 describe('server/models/todo', () => {
